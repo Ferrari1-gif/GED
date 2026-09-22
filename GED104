@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AgriKonek-Solaris | GED 104 STS Module Exam 1</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js for Telemetry Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            agri: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            solar: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-panel-light {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #16a34a;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen transition-colors duration-300" id="appBody">
+
+  <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Project Meta -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-agri-600 to-solar-500 flex items-center justify-center shadow-lg shadow-agri-500/20">
+          <i data-lucide="zap" class="w-6 h-6 text-slate-950"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-lg leading-tight tracking-wide text-white">AgriKonek-Solaris</h1>
+            <span class="bg-agri-500/20 text-agri-400 text-xs px-2 py-0.5 rounded-full font-semibold border border-agri-500/30">GED 104 STS</span>
+          </div>
+          <p class="text-xs text-slate-400">Module Exam 1 Prototype: Hydro-Solar Cold Chain Platform</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (Part V Removed) -->
+      <nav class="flex items-center gap-1 sm:gap-2 overflow-x-auto py-1 text-sm font-medium">
+        <button onclick="switchTab('tab-overview')" id="btn-tab-overview" class="nav-btn px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-agri-400 bg-agri-950/60 border border-agri-500/30">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>STS Context</span>
+        </button>
+        <button onclick="switchTab('tab-comparative')" id="btn-tab-comparative" class="nav-btn px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="git-compare" class="w-4 h-4"></i>
+          <span>Gap Matrix</span>
+        </button>
+        <button onclick="switchTab('tab-invention')" id="btn-tab-invention" class="nav-btn px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="cpu" class="w-4 h-4"></i>
+          <span>Novelty & Tech</span>
+        </button>
+        <button onclick="switchTab('tab-simulator')" id="btn-tab-simulator" class="nav-btn px-3 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>Live Simulator</span>
+        </button>
+      </nav>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors" title="Toggle Light/Dark Theme">
+          <i data-lucide="sun-moon" class="w-4 h-4"></i>
+        </button>
+        <a href="#simulator" onclick="switchTab('tab-simulator')" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-agri-600 to-agri-500 hover:from-agri-500 hover:to-agri-400 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-sm transition-all shadow-md">
+          <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+          <span>Demo Simulation</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-8">
+
+    <!-- Academic Banner Header -->
+    <div class="glass-panel rounded-2xl p-6 border border-slate-800 relative overflow-hidden">
+      <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-agri-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-12 -top-12 w-64 h-64 bg-solar-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+        <div class="lg:col-span-2 space-y-3">
+          <div class="flex flex-wrap items-center gap-2 text-xs font-semibold tracking-wider text-agri-400 uppercase">
+            <span class="bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-700">Course: GED 104 STS</span>
+            <span class="bg-slate-900/80 px-2.5 py-1 rounded-md border border-slate-700">Module Exam 1</span>
+            <span class="bg-solar-500/20 text-solar-400 px-2.5 py-1 rounded-md border border-solar-500/30">Individual Prototype</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            AgriKonek-Solaris: Zero-Emission Modular Hydro-Solar Cold Storage & Logistics Platform
+          </h2>
+          <p class="text-slate-300 text-sm leading-relaxed">
+            An original STS innovation responding to post-harvest produce spoilage among Philippine micro-farmers. Integrates dual-stage Peltier solid-state cooling, salt-hydrate PCM thermal storage, and off-grid LoRa mesh micro-logistics.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/80 rounded-xl p-4 border border-slate-800 text-xs space-y-2">
+          <div class="flex justify-between border-b border-slate-800 pb-2">
+            <span class="text-slate-400">Context:</span>
+            <span class="font-medium text-slate-200">Philippine Agriculture (Benguet/Luzon)</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800 pb-2">
+            <span class="text-slate-400">Target Issue:</span>
+            <span class="font-medium text-rose-400">30–40% Post-Harvest Loss</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800 pb-2">
+            <span class="text-slate-400">Core Tech:</span>
+            <span class="font-medium text-agri-400">Solid-State Thermoelectric + PCM</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">Logistics:</span>
+            <span class="font-medium text-solar-400">Offline LoRa Mesh Network</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="tab-overview" class="tab-content space-y-6">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="history" class="text-agri-500"></i> Part I: Problem & Historical STS Context
+          </h3>
+          <p class="text-xs text-slate-400">Evolution of food preservation tech and its socio-historical relation to Philippine nation-building.</p>
+        </div>
+      </div>
+
+      <!-- Historical Evolution Timeline -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Pre-Colonial -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-amber-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-800">1. Pre-Colonial Era</span>
+            <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <h4 class="font-semibold text-base text-white">Traditional Thermal & Biological Methods</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Preservation relied heavily on salting (<em>daing/tuyo</em>), drying, smoking (<em>tinapa</em>), and fermentation (<em>bagoong</em>). While effective for extended shelf life, these methods fundamentally alter the raw state, market value, and freshness of fruits and vegetables.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded border border-slate-800">
+            <strong>STS Insight:</strong> Indigenous knowledge adapted to local tropical humidity, but could not preserve live botanical tissue without chemical transformation.
+          </div>
+        </div>
+
+        <!-- Industrial Revolution -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-blue-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-blue-400 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-800">2. Industrial Era</span>
+            <i data-lucide="snowflake" class="w-4 h-4 text-blue-400"></i>
+          </div>
+          <h4 class="font-semibold text-base text-white">Mechanical Vapor-Compression</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            The invention of compressor-based refrigeration enabled active temperature reduction ($2^\circ\text{C}-8^\circ\text{C}$). However, this technology was engineered around centralized urban industrial grids with heavy copper loops, power-hungry AC compressors, and chemical refrigerants.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded border border-slate-800">
+            <strong>STS Insight:</strong> Technology created structural urban-rural inequality; cold chains served centralized ports rather than dispersed agricultural highlands.
+          </div>
+        </div>
+
+        <!-- Modern PH Crisis -->
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-rose-500 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-rose-400 bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800">3. Modern Philippine Context</span>
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
+          </div>
+          <h4 class="font-semibold text-base text-white">High Electricity Costs & Middlemen Exploitation</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            The Philippines suffers from high electricity rates and frequent provincial blackouts. Smallholder farmers, lacking individual cold storage, are forced to panic-sell produce at cut-rate prices to traders (<em>tradores</em>), causing up to 40% post-harvest spoilage.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded border border-slate-800">
+            <strong>STS Insight:</strong> Infrastructure gaps directly trigger agrarian poverty, urban food inflation, and national food insecurity.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Problem Analytics Callout -->
+      <div class="glass-panel p-6 rounded-xl border border-agri-500/20 bg-gradient-to-r from-slate-900 via-agri-950/30 to-slate-900 grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+        <div class="space-y-1">
+          <div class="text-3xl font-black text-rose-400">30% - 40%</div>
+          <div class="text-xs text-slate-400">Post-Harvest Fruit & Vegetable Loss</div>
+        </div>
+        <div class="space-y-1">
+          <div class="text-3xl font-black text-solar-400">₱10 - 14 / kWh</div>
+          <div class="text-xs text-slate-400">Average Provincial Rural Grid Electricity Cost</div>
+        </div>
+        <div class="space-y-1">
+          <div class="text-3xl font-black text-agri-400">75%</div>
+          <div class="text-xs text-slate-400">Micro-Farmers Lacking Cold Storage Access</div>
+        </div>
+        <div class="space-y-1">
+          <div class="text-3xl font-black text-blue-400">12 - 24 hrs</div>
+          <div class="text-xs text-slate-400">Critical Shelf-life Window without Preservation</div>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="tab-comparative" class="tab-content hidden space-y-6">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="git-compare" class="text-agri-500"></i> Part II: Comparative Matrix & Identified Gap
+          </h3>
+          <p class="text-xs text-slate-400">Evaluating existing solutions against AgriKonek-Solaris to isolate the unresolved technological gap.</p>
+        </div>
+      </div>
+
+      <!-- Matrix Table -->
+      <div class="glass-panel rounded-xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900 text-slate-300 uppercase tracking-wider font-semibold border-b border-slate-800">
+              <tr>
+                <th class="p-4">Solution Type</th>
+                <th class="p-4">Primary Mechanism</th>
+                <th class="p-4">Key Strengths</th>
+                <th class="p-4">Fundamental Limitations</th>
+                <th class="p-4 text-agri-400">Philippine Agrarian Fit</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              
+              <!-- Row 1 -->
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-4 font-bold text-white flex items-center gap-2">
+                  <i data-lucide="box" class="w-4 h-4 text-slate-400"></i>
+                  Standard Grid Walk-in Cold Rooms
+                </td>
+                <td class="p-4">High-power mechanical vapor compression loops using fluorocarbon refrigerants.</td>
+                <td class="p-4 text-emerald-400">Large volumetric cooling capacity; reliable steady-state temp ($2^\circ\text{C}$).</td>
+                <td class="p-4 text-rose-400">Prohibitively expensive capital expenditure; unviable during rural grid outages.</td>
+                <td class="p-4"><span class="bg-rose-950 text-rose-400 px-2 py-1 rounded border border-rose-800">Unsuited for Micro-Farmers</span></td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-4 font-bold text-white flex items-center gap-2">
+                  <i data-lucide="truck" class="w-4 h-4 text-slate-400"></i>
+                  Diesel-Powered Refrigerated Trucks
+                </td>
+                <td class="p-4">Engine-driven compressor cooling coupled with diesel fuel transport engines.</td>
+                <td class="p-4 text-emerald-400">Direct farm-to-market mobility and active highway refrigeration.</td>
+                <td class="p-4 text-rose-400">High operational fuel costs; carbon emissions; requires full load volumes to justify trip.</td>
+                <td class="p-4"><span class="bg-amber-950 text-amber-400 px-2 py-1 rounded border border-amber-800">Expensive / Middlemen Dominated</span></td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-4 font-bold text-white flex items-center gap-2">
+                  <i data-lucide="droplet" class="w-4 h-4 text-slate-400"></i>
+                  Evaporative Charcoal Coolers
+                </td>
+                <td class="p-4">Passive moisture evaporation through wet sand/charcoal wall linings.</td>
+                <td class="p-4 text-emerald-400">Zero electricity required; extremely cheap construction materials.</td>
+                <td class="p-4 text-rose-400">Incapable of reaching sub-10°C targets; ineffective during humid rainy seasons.</td>
+                <td class="p-4"><span class="bg-amber-950 text-amber-400 px-2 py-1 rounded border border-amber-800">Limited Preservation Life</span></td>
+              </tr>
+
+              <!-- Row 4 (Invention) -->
+              <tr class="bg-agri-950/40 border-l-4 border-l-agri-500 font-medium">
+                <td class="p-4 font-bold text-agri-300 flex items-center gap-2">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-solar-400"></i>
+                  AgriKonek-Solaris (Our Invention)
+                </td>
+                <td class="p-4 text-slate-200">Solid-state dual Peltier cooling + Salt-hydrate PCM battery + LoRa mesh dispatch.</td>
+                <td class="p-4 text-emerald-300">Zero fuel costs; off-grid thermal buffer overnight; shared micro-logistics pooling.</td>
+                <td class="p-4 text-slate-400">Modular design tailored for batch micro-yields rather than mega-industrial scale.</td>
+                <td class="p-4"><span class="bg-agri-500 text-slate-950 font-bold px-2.5 py-1 rounded shadow">Optimal Agrarian Fit</span></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gap Identification Box -->
+      <div class="glass-panel p-5 rounded-xl border border-solar-500/30 bg-solar-950/20 space-y-3">
+        <h4 class="text-sm font-bold text-solar-400 uppercase tracking-wide flex items-center gap-2">
+          <i data-lucide="target" class="w-4 h-4"></i> The Identified Technological Gap
+        </h4>
+        <p class="text-xs text-slate-200 leading-relaxed">
+          While existing solutions offer either <em>high-capacity/high-cost central cooling</em> or <em>ultra-low-cost passive evaporation</em>, there is a distinct lack of a <strong>decentralized, modular, off-grid active refrigeration system</strong> that integrates <strong>thermal energy storage (TES)</strong> for night preservation without reliance on heavy lithium battery banks or expensive diesel transport.
+        </p>
+      </div>
+
+    </section>
+
+    <section id="tab-invention" class="tab-content hidden space-y-6">
+      
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="cpu" class="text-agri-500"></i> Part III: Invention Specification & Novelty
+          </h3>
+          <p class="text-xs text-slate-400">Technical breakdown of AgriKonek-Solaris core components and architectural novelty.</p>
+        </div>
+      </div>
+
+      <!-- 3 Pillar Engineering Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Pillar 1 -->
+        <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-4">
+          <div class="w-10 h-10 rounded-lg bg-agri-500/20 border border-agri-500/40 flex items-center justify-center text-agri-400">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">1. Dual-Stage Thermoelectric Core</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Eliminates traditional compressors, refrigerants, and mechanical wear. Uses solid-state Peltier semiconductors coupled with heat pipes and liquid cooling blocks to transfer heat out of the insulated chamber with high reliability.
+          </p>
+          <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+            <li>Zero chemical refrigerant emissions</li>
+            <li>No moving compressor parts</li>
+            <li>Solid-state vibration-free design</li>
+          </ul>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+            <i data-lucide="thermometer-snowflake" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">2. Salt-Hydrate PCM Battery</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            A specialized Phase Change Material (PCM) thermal battery surrounding the storage chamber. During peak sunlit hours, excess solar energy freezes the PCM salt-hydrate solution. Overnight, the solidifying PCM passively absorbs internal heat without battery draw.
+          </p>
+          <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+            <li>Phase change point calibrated at 5°C</li>
+            <li>Stores cold thermal energy passively</li>
+            <li>Reduces electrical battery requirements by 65%</li>
+          </ul>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-4">
+          <div class="w-10 h-10 rounded-lg bg-solar-500/20 border border-solar-500/40 flex items-center justify-center text-solar-400">
+            <i data-lucide="radio" class="w-5 h-5"></i>
+          </div>
+          <h4 class="font-bold text-base text-white">3. Off-Grid LoRa Mesh Logistics</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Integrated ESP32 microcontroller with LoRa (Long Range) 433/915MHz radio links units across neighboring farms. Farmers broadcast available storage space and harvest transport readiness without internet or cellular reception.
+          </p>
+          <ul class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+            <li>10km direct radio link line-of-sight</li>
+            <li>Zero cellular data or internet fees</li>
+            <li>Autonomous peer-to-peer load pooling</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Novelty Summary Box -->
+      <div class="glass-panel p-6 rounded-xl border border-agri-500/30 bg-agri-950/20 space-y-3">
+        <h4 class="text-sm font-bold text-agri-400 uppercase tracking-wide flex items-center gap-2">
+          <i data-lucide="award" class="w-4 h-4"></i> Novelty Justification for STS Exam Criteria
+        </h4>
+        <p class="text-xs text-slate-200 leading-relaxed">
+          AgriKonek-Solaris goes beyond modifying existing products. It creates a novel system-level integration: merging <strong>solid-state physics (Peltier)</strong> with <strong>passive thermodynamic storage (PCM)</strong> and <strong>decentralized communication (LoRa Mesh)</strong> to address a socio-technical crisis in Philippine agriculture without high grid costs or fossil fuel consumption.
+        </p>
+      </div>
+
+    </section>
+
+    <section id="tab-simulator" class="tab-content hidden space-y-6">
+      
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="activity" class="text-agri-500"></i> Part IV: Real-Time Functional Simulator & Telemetry
+          </h3>
+          <p class="text-xs text-slate-400">Test solar input, thermal battery discharge, load changes, and LoRa mesh node packets.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="resetSimulation()" class="text-xs bg-slate-900 border border-slate-700 hover:border-slate-500 px-3 py-1.5 rounded-lg text-slate-300 flex items-center gap-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+          <button id="btn-toggle-sim" onclick="toggleSimulation()" class="text-xs bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow">
+            <i data-lucide="pause" class="w-3.5 h-3.5 fill-current"></i> Pause Sim
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls & Dashboard Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Controls Column -->
+        <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-5">
+          <h4 class="font-bold text-sm text-white border-b border-slate-800 pb-2 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-solar-400"></i> Environmental Controls
+          </h4>
+
+          <!-- Solar Cycle Control -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">Solar Cycle Mode:</span>
+              <span id="txt-solar-mode" class="font-bold text-solar-400">Peak Sun (12:00 PM)</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setSolarMode('day')" id="btn-mode-day" class="text-xs py-2 rounded-lg bg-solar-500/20 border border-solar-500/40 text-solar-300 font-semibold flex items-center justify-center gap-2">
+                <i data-lucide="sun" class="w-4 h-4"></i> Day (Peak Solar)
+              </button>
+              <button onclick="setSolarMode('night')" id="btn-mode-night" class="text-xs py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center gap-2">
+                <i data-lucide="moon" class="w-4 h-4"></i> Night (PCM Storage)
+              </button>
+            </div>
+          </div>
+
+          <!-- Ambient Temp Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">Ambient Temperature:</span>
+              <span id="lbl-ambient-temp" class="font-bold text-white">32 °C</span>
+            </div>
+            <input type="range" id="input-ambient" min="20" max="42" value="32" oninput="updateSimControls()" class="w-full accent-agri-500 cursor-pointer" />
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>20°C (Benguet)</span>
+              <span>42°C (Summer Manila)</span>
+            </div>
+          </div>
+
+          <!-- Cargo Load Weight Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">Cargo Crop Load:</span>
+              <span id="lbl-cargo-load" class="font-bold text-white">50 kg</span>
+            </div>
+            <input type="range" id="input-cargo" min="10" max="150" value="50" oninput="updateSimControls()" class="w-full accent-agri-500 cursor-pointer" />
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>10 kg (Batch Sample)</span>
+              <span>150 kg (Full Module Capacity)</span>
+            </div>
+          </div>
+
+          <!-- PCM Battery Thermal Boost Toggle -->
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-semibold text-white">PCM Battery Phase Activation</div>
+              <div class="text-[11px] text-slate-400">Salt-hydrate passive discharge</div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="chk-pcm" checked onchange="updateSimControls()" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-agri-600"></div>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Real-Time Metrics Gauge Panel -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            
+            <!-- Solar Power Wattage -->
+            <div class="glass-panel p-4 rounded-xl border border-slate-800 space-y-1">
+              <div class="flex justify-between items-center text-slate-400 text-xs">
+                <span>Solar Output</span>
+                <i data-lucide="sun" class="w-4 h-4 text-solar-400"></i>
+              </div>
+              <div id="metric-solar" class="text-2xl font-black text-solar-400">180 W</div>
+              <div class="text-[10px] text-slate-500">12V Monocrystalline</div>
+            </div>
+
+            <!-- Internal Storage Temp -->
+            <div class="glass-panel p-4 rounded-xl border border-slate-800 space-y-1">
+              <div class="flex justify-between items-center text-slate-400 text-xs">
+                <span>Internal Temp</span>
+                <i data-lucide="thermometer" class="w-4 h-4 text-agri-400"></i>
+              </div>
+              <div id="metric-internal-temp" class="text-2xl font-black text-agri-400">4.8 °C</div>
+              <div id="status-target" class="text-[10px] text-emerald-400 font-medium">Optimal (2°C - 8°C)</div>
+            </div>
+
+            <!-- PCM Battery Charge State -->
+            <div class="glass-panel p-4 rounded-xl border border-slate-800 space-y-1">
+              <div class="flex justify-between items-center text-slate-400 text-xs">
+                <span>PCM Thermal State</span>
+                <i data-lucide="battery-charging" class="w-4 h-4 text-blue-400"></i>
+              </div>
+              <div id="metric-pcm-state" class="text-lg font-bold text-blue-400">Solid / 88%</div>
+              <div class="text-[10px] text-slate-500">Salt-Hydrate Buffer</div>
+            </div>
+
+            <!-- Total System Power Draw -->
+            <div class="glass-panel p-4 rounded-xl border border-slate-800 space-y-1">
+              <div class="flex justify-between items-center text-slate-400 text-xs">
+                <span>Peltier Core Draw</span>
+                <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+              </div>
+              <div id="metric-power-draw" class="text-2xl font-black text-amber-400">65 W</div>
+              <div class="text-[10px] text-slate-500">Dual-Stage Solid State</div>
+            </div>
+
+          </div>
+
+          <!-- Chart Visualizer -->
+          <div class="glass-panel p-5 rounded-xl border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-sm text-white flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-4 h-4 text-agri-500"></i> Live Thermal Telemetry Stream
+              </h4>
+              <span class="text-[11px] text-slate-400">Updates every 1.5 seconds</span>
+            </div>
+            <div class="h-56 relative">
+              <canvas id="telemetryChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- LoRa Mesh Network Telemetry Visualizer -->
+      <div class="glass-panel p-6 rounded-xl border border-slate-800 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h4 class="font-bold text-base text-white flex items-center gap-2">
+              <i data-lucide="network" class="text-solar-400"></i> Off-Grid LoRa Mesh Micro-Logistics Visualizer
+            </h4>
+            <p class="text-xs text-slate-400">Real-time radio telemetry packet broadcasting between Benguet farm nodes and transport hub.</p>
+          </div>
+          <span class="bg-solar-500/20 text-solar-300 text-xs px-2.5 py-1 rounded-full font-mono border border-solar-500/30 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-solar-400 animate-pulse"></span> LoRa 915MHz Active
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Node 1 -->
+          <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-2 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-200">Node #01: Atok Farm Unit</span>
+              <span class="text-[10px] bg-agri-950 text-agri-400 px-2 py-0.5 rounded border border-agri-800">Master Sender</span>
+            </div>
+            <div class="text-xs text-slate-400 space-y-1 font-mono">
+              <div>Temp: <span class="text-agri-400 font-bold">4.8°C</span> | Storage: <span class="text-white font-bold">85/150 kg</span></div>
+              <div>RSSI: <span class="text-slate-300">-84 dBm</span> | Status: <span class="text-emerald-400">Cold Chain Active</span></div>
+            </div>
+            <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
+              <span>Payload: #4802-ATK</span>
+              <span>Broadcast: 2s ago</span>
+            </div>
+          </div>
+
+          <!-- Node 2 -->
+          <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-slate-200">Node #02: La Trinidad Node</span>
+              <span class="text-[10px] bg-blue-950 text-blue-400 px-2 py-0.5 rounded border border-blue-800">Relay Hop 1</span>
+            </div>
+            <div class="text-xs text-slate-400 space-y-1 font-mono">
+              <div>Temp: <span class="text-agri-400 font-bold">5.2°C</span> | Storage: <span class="text-white font-bold">120/150 kg</span></div>
+              <div>RSSI: <span class="text-slate-300">-91 dBm</span> | Status: <span class="text-emerald-400">Cold Chain Active</span></div>
+            </div>
+            <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
+              <span>Payload: #4803-LTR</span>
+              <span>Broadcast: 1s ago</span>
+            </div>
+          </div>
+
+          <!-- Node 3 Hub -->
+          <div class="bg-slate-900/90 rounded-xl p-4 border border-solar-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-solar-300">Hub #03: Dispatch Center</span>
+              <span class="text-[10px] bg-solar-950 text-solar-400 px-2 py-0.5 rounded border border-solar-800">Central Receiver</span>
+            </div>
+            <div class="text-xs text-slate-400 space-y-1 font-mono">
+              <div>Pooled Capacity: <span class="text-solar-400 font-bold">205 kg / 300 kg</span></div>
+              <div>Combined Reefer Readiness: <span class="text-emerald-400 font-bold">94%</span></div>
+            </div>
+            <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
+              <span>Truck Dispatch Status:</span>
+              <span class="text-solar-400 font-bold">Optimized Route Ready</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // Global State
+    let isDark = true;
+    let isSimRunning = true;
+    let simInterval = null;
+    let solarMode = 'day'; // 'day' or 'night'
+    let ambientTemp = 32;
+    let cargoLoad = 50;
+    let isPcmActive = true;
+
+    // Live Metrics
+    let currentInternalTemp = 4.8;
+    let currentSolarWatts = 180;
+    let currentPowerDraw = 65;
+    let pcmChargePercent = 88;
+
+    // Telemetry Chart Setup
+    let telemetryChart = null;
+    const chartTimeLabels = [];
+    const tempDataPoints = [];
+    const solarDataPoints = [];
+
+    // Initialize Application
+    window.onload = function() {
+      lucide.createIcons();
+      initChart();
+      startSimulation();
+    };
+
+    // Tab Switch Logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-agri-400', 'bg-agri-950/60', 'border', 'border-agri-500/30');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-agri-400', 'bg-agri-950/60', 'border', 'border-agri-500/30');
+      }
+
+      // Re-render Lucide icons inside active tab
+      lucide.createIcons();
+    }
+
+    // Toggle Theme
+    function toggleTheme() {
+      isDark = !isDark;
+      const body = document.getElementById('appBody');
+      if (isDark) {
+        body.classList.add('dark');
+        body.classList.remove('bg-slate-100', 'text-slate-900');
+        body.classList.add('bg-slate-950', 'text-slate-100');
+      } else {
+        body.classList.remove('dark');
+        body.classList.remove('bg-slate-950', 'text-slate-100');
+        body.classList.add('bg-slate-100', 'text-slate-900');
+      }
+    }
+
+    // Initialize Chart.js
+    function initChart() {
+      const ctx = document.getElementById('telemetryChart').getContext('2d');
+      
+      // Initial Mock Time
+      for (let i = 10; i >= 0; i--) {
+        chartTimeLabels.push(i + 's ago');
+        tempDataPoints.push(4.8 + (Math.random() * 0.4 - 0.2));
+        solarDataPoints.push(180);
+      }
+
+      telemetryChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartTimeLabels,
+          datasets: [
+            {
+              label: 'Internal Storage (°C)',
+              data: tempDataPoints,
+              borderColor: '#22c55e',
+              backgroundColor: 'rgba(34, 197, 94, 0.1)',
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: 'yTemp',
+              fill: true,
+            },
+            {
+              label: 'Solar Output (W)',
+              data: solarDataPoints,
+              borderColor: '#f59e0b',
+              borderDash: [4, 4],
+              borderWidth: 1.5,
+              tension: 0.1,
+              yAxisID: 'ySolar',
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#94a3b8', font: { size: 10 } }
+            },
+            yTemp: {
+              type: 'linear',
+              position: 'left',
+              min: 0,
+              max: 20,
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#22c55e', font: { size: 10 } },
+              title: { display: true, text: 'Temp (°C)', color: '#22c55e', font: { size: 10 } }
+            },
+            ySolar: {
+              type: 'linear',
+              position: 'right',
+              min: 0,
+              max: 250,
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#f59e0b', font: { size: 10 } },
+              title: { display: true, text: 'Solar (W)', color: '#f59e0b', font: { size: 10 } }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: '#cbd5e1', font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+
+    // Simulation Controls Handler
+    function updateSimControls() {
+      ambientTemp = parseFloat(document.getElementById('input-ambient').value);
+      cargoLoad = parseFloat(document.getElementById('input-cargo').value);
+      isPcmActive = document.getElementById('chk-pcm').checked;
+
+      document.getElementById('lbl-ambient-temp').innerText = ambientTemp + ' °C';
+      document.getElementById('lbl-cargo-load').innerText = cargoLoad + ' kg';
+    }
+
+    function setSolarMode(mode) {
+      solarMode = mode;
+      const dayBtn = document.getElementById('btn-mode-day');
+      const nightBtn = document.getElementById('btn-mode-night');
+      const txtMode = document.getElementById('txt-solar-mode');
+
+      if (mode === 'day') {
+        txtMode.innerText = 'Peak Sun (12:00 PM)';
+        txtMode.className = 'font-bold text-solar-400';
+        dayBtn.className = 'text-xs py-2 rounded-lg bg-solar-500/20 border border-solar-500/40 text-solar-300 font-semibold flex items-center justify-center gap-2';
+        nightBtn.className = 'text-xs py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center gap-2';
+      } else {
+        txtMode.innerText = 'Night Cycle (00:00 AM)';
+        txtMode.className = 'font-bold text-blue-400';
+        nightBtn.className = 'text-xs py-2 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 font-semibold flex items-center justify-center gap-2';
+        dayBtn.className = 'text-xs py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white flex items-center justify-center gap-2';
+      }
+    }
+
+    // Start Real-Time Simulation Loop
+    function startSimulation() {
+      if (simInterval) clearInterval(simInterval);
+      simInterval = setInterval(() => {
+        if (!isSimRunning) return;
+
+        // Compute Solar Input
+        if (solarMode === 'day') {
+          currentSolarWatts = Math.min(220, 180 + (Math.random() * 20 - 10));
+          currentPowerDraw = 65;
+          // Charge PCM
+          pcmChargePercent = Math.min(100, pcmChargePercent + 0.5);
+        } else {
+          currentSolarWatts = 0;
+          currentPowerDraw = 0; // Solar off
+          // Discharge PCM
+          if (isPcmActive) {
+            pcmChargePercent = Math.max(10, pcmChargePercent - 0.8);
+          }
+        }
+
+        // Calculate Target Internal Temperature
+        let targetTemp = 4.5;
+        
+        // Heat load from ambient
+        const heatLeakage = (ambientTemp - 20) * 0.08;
+        const cargoInertia = cargoLoad * 0.02;
+
+        if (solarMode === 'day') {
+          targetTemp = 4.0 + heatLeakage + cargoInertia * 0.1;
+        } else {
+          // Night condition
+          if (isPcmActive && pcmChargePercent > 15) {
+            targetTemp = 5.2 + heatLeakage * 0.5; // PCM maintains thermal stability
+          } else {
+            targetTemp = ambientTemp - 2.0; // Without PCM, warms quickly
+          }
+        }
+
+        // Smooth Temperature Drift
+        currentInternalTemp += (targetTemp - currentInternalTemp) * 0.15 + (Math.random() * 0.1 - 0.05);
+
+        // Update Gauge UI
+        document.getElementById('metric-solar').innerText = Math.round(currentSolarWatts) + ' W';
+        document.getElementById('metric-internal-temp').innerText = currentInternalTemp.toFixed(1) + ' °C';
+        document.getElementById('metric-power-draw').innerText = Math.round(currentPowerDraw) + ' W';
+
+        const pcmElem = document.getElementById('metric-pcm-state');
+        if (pcmChargePercent > 50) {
+          pcmElem.innerText = 'Solid / ' + Math.round(pcmChargePercent) + '%';
+          pcmElem.className = 'text-lg font-bold text-blue-400';
+        } else if (pcmChargePercent > 20) {
+          pcmElem.innerText = 'Phase Shift / ' + Math.round(pcmChargePercent) + '%';
+          pcmElem.className = 'text-lg font-bold text-solar-400';
+        } else {
+          pcmElem.innerText = 'Liquid / ' + Math.round(pcmChargePercent) + '%';
+          pcmElem.className = 'text-lg font-bold text-rose-400';
+        }
+
+        const targetStatus = document.getElementById('status-target');
+        if (currentInternalTemp >= 2.0 && currentInternalTemp <= 8.0) {
+          targetStatus.innerText = 'Optimal (2°C - 8°C)';
+          targetStatus.className = 'text-[10px] text-emerald-400 font-medium';
+        } else {
+          targetStatus.innerText = 'Warning: Temp Excursion';
+          targetStatus.className = 'text-[10px] text-rose-400 font-bold';
+        }
+
+        // Update Chart
+        if (telemetryChart) {
+          chartTimeLabels.shift();
+          chartTimeLabels.push(new Date().toLocaleTimeString().split(' ')[0]);
+          tempDataPoints.shift();
+          tempDataPoints.push(parseFloat(currentInternalTemp.toFixed(1)));
+          solarDataPoints.shift();
+          solarDataPoints.push(Math.round(currentSolarWatts));
+
+          telemetryChart.update('none');
+        }
+
+      }, 1500);
+    }
+
+    function toggleSimulation() {
+      isSimRunning = !isSimRunning;
+      const btn = document.getElementById('btn-toggle-sim');
+      if (isSimRunning) {
+        btn.innerHTML = `<i data-lucide="pause" class="w-3.5 h-3.5 fill-current"></i> Pause Sim`;
+        btn.className = 'text-xs bg-agri-500 hover:bg-agri-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow';
+      } else {
+        btn.innerHTML = `<i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i> Resume Sim`;
+        btn.className = 'text-xs bg-solar-500 hover:bg-solar-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shadow';
+      }
+      lucide.createIcons();
+    }
+
+    function resetSimulation() {
+      currentInternalTemp = 4.8;
+      pcmChargePercent = 88;
+      setSolarMode('day');
+      document.getElementById('input-ambient').value = 32;
+      document.getElementById('input-cargo').value = 50;
+      document.getElementById('chk-pcm').checked = true;
+      updateSimControls();
+    }
+  </script>
+
+</body>
+</html>
